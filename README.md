@@ -1,4 +1,4 @@
-# Release Sync
+# Release Forge
 
 Automatically creates and maintains **Release** work items in Azure DevOps by aggregating Features and Defects that share the same release date. Runs on a schedule (every 30 minutes) and supports both **Azure DevOps Pipelines** and **GitHub Actions**.
 
