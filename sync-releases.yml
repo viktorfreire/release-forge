@@ -1,0 +1,40 @@
+trigger: none
+pr: none
+
+schedules:
+- cron: '*/30 * * * *'
+  displayName: 'Every 30 minutes sync'
+  branches:
+    include:
+    - main
+  always: true
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  organisation:               '[DevopsOrganizationName]'
+  project:                    '[DevopsProjectName]'
+  mappingsFile:               '$(Build.SourcesDirectory)/scripts/teamMappings.json'
+  releaseDateField:           'Custom.Release'
+  releaseWit:                 'Release'
+  businessJustificationField: 'Custom.BusinessValues'
+  ticketingSystemBaseUrl:     'https://[ServiceNowInstanceName].service-now.comm'
+
+steps:
+- checkout: self
+
+- task: PowerShell@2
+  displayName: 'Sync Releases'
+  inputs:
+    filePath: 'scripts/Delivery.Main.ps1'
+    arguments: >
+      -organisation "$(organisation)"
+      -project "$(project)"
+      -mappingsFile "$(mappingsFile)"
+      -releaseDateField "$(releaseDateField)"
+      -releaseWit "$(releaseWit)"
+      -businessJustificationField "$(businessJustificationField)"
+      -ticketingSystemBaseUrl "$(ticketingSystemBaseUrl)"
+  env:
+    SYSTEM_ACCESSTOKEN: $(System.AccessToken)
