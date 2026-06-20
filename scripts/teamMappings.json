@@ -1,0 +1,12 @@
+[
+  {
+    "areaPath": "[DevopsOrganizationName]\\[DevopsTeamAreaPath]",
+    "teamName": "[TeamName]",
+    "assignedTo": "[TeamManagerDomainUser]"
+  },
+  {
+    "areaPath":   "The Amazig Aventures\\Spiderman",
+    "teamName":   "Power Platform",
+    "assignedTo": "peter.parker@TheAmazingAventures.com"
+  }
+]
