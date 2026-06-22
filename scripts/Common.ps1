@@ -1,6 +1,6 @@
 function Resolve-AccessToken {
-    if ($env:ACCESS_TOKEN)      { return $env:ACCESS_TOKEN      }
-    if ($env:SYSTEM_ACCESSTOKEN){ return $env:SYSTEM_ACCESSTOKEN }
+    if ($env:ACCESS_TOKEN)       { return $env:ACCESS_TOKEN       }
+    if ($env:SYSTEM_ACCESSTOKEN) { return $env:SYSTEM_ACCESSTOKEN }
     Write-Error "No access token found. Set ACCESS_TOKEN (GitHub Actions) or SYSTEM_ACCESSTOKEN (Azure DevOps)."
     exit 1
 }
@@ -32,16 +32,21 @@ function Get-WorkItemsInBatches {
 function Sanitize {
     param([string]$value)
     if ([string]::IsNullOrWhiteSpace($value)) { return "" }
-    $clean = $value -replace "&nbsp;",       " "
-    $clean = $clean -replace "&amp;",        "&"
-    $clean = $clean -replace "&lt;",         "<"
-    $clean = $clean -replace "&gt;",         ">"
-    $clean = $clean -replace "&quot;",       '"'
-    $clean = $clean -replace "&#39;",        "'"
-    $clean = $clean -replace "&[a-zA-Z]+;",  ""
-    $clean = $clean -replace "<[^>]*>",      ""
-    $clean = $clean -replace "[\r\n]+",      " "
-    $clean = $clean -replace "\s{2,}",       " "
+
+    # Decode all HTML entities (&amp;, &nbsp;, &lt;, &#39;, &#160; etc.)
+    # Two passes handles double-encoded content e.g. &amp;lt; -> &lt; -> <
+    $clean = [System.Web.HttpUtility]::HtmlDecode($value)
+    $clean = [System.Web.HttpUtility]::HtmlDecode($clean)
+
+    # Strip all HTML tags
+    $clean = $clean -replace "<[^>]*>", ""
+
+    # Normalise whitespace — including non-breaking space produced by &nbsp;
+    $clean = $clean -replace "[ \r\n\t]", " "
+    $clean = $clean -replace "\s{2,}",    " "
+
+    # Keep only printable ASCII
     $clean = $clean -replace "[^\x20-\x7E]", ""
+
     return $clean.Trim()
 }
